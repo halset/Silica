@@ -604,8 +604,14 @@ public final class CGContext {
         switch mode {
         case .fill: try! fillPath(evenOdd: false, preserve: false)
         case .evenOddFill: try! fillPath(evenOdd: true, preserve: false)
-        case .fillStroke: try! fillPath(evenOdd: false, preserve: true)
-        case .evenOddFillStroke: try! fillPath(evenOdd: true, preserve: true)
+        case .fillStroke:
+            try! fillPath(evenOdd: false, preserve: true)
+            strokePath()
+            internalContext.newPath()
+        case .evenOddFillStroke:
+            try! fillPath(evenOdd: true, preserve: true)
+            strokePath()
+            internalContext.newPath()
         case .stroke: strokePath()
         }
     }
@@ -626,19 +632,8 @@ public final class CGContext {
     }
     
     public func clip(using rule: CGPathFillRule = .winding) {
-
-        if rule == .evenOdd {
-            
-            internalContext.fillRule = CAIRO_FILL_RULE_EVEN_ODD
-        }
         
-        internalContext.clip()
-        
-        if rule == .evenOdd {
-            
-            internalContext.fillRule = CAIRO_FILL_RULE_WINDING
-        }
-
+        clip(evenOdd: rule == .evenOdd)
     }
 
     
