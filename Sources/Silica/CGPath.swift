@@ -97,14 +97,14 @@ public extension CGPath {
         elements.append(.addCurveToPoint(p1, p2, p))
     }
     
-    func move(to: CGPoint) {
+    func move(to point: CGPoint) {
         
-        elements.append(.moveToPoint(to))
+        elements.append(.moveToPoint(point))
     }
     
-    func addLine(to: CGPoint) {
+    func addLine(to point: CGPoint) {
         
-        elements.append(.addLineToPoint(to))
+        elements.append(.addLineToPoint(point))
     }
     
     func addCurve(to endPoint: CGPoint, control1: CGPoint, control2: CGPoint) {
