@@ -45,6 +45,14 @@ public final class CGContext {
         // Cairo defaults to line width 2.0
         context.lineWidth = 1.0
         
+        // Cairo has origo upper left, but Core Graphics has it lower left.
+        context.transform(Matrix(xx: Matrix.identity.xx,
+                                 yx: Matrix.identity.yx,
+                                 xy: Matrix.identity.xy,
+                                 yy: -1.0,
+                                 x0: Matrix.identity.x0,
+                                 y0: size.height))
+
         self.size = size
         self.internalContext = context
         self.surface = surface
