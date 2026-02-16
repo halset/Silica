@@ -79,6 +79,10 @@ public final class CGContext {
         set { internalContext.lineWidth = Double(newValue) }
     }
     
+    public func setLineWidth(_ width: CGFloat) {
+        self.lineWidth = width
+    }
+    
     public var lineJoin: CGLineJoin {
         
         get { return CGLineJoin(cairo: internalContext.lineJoin) }
@@ -194,11 +198,27 @@ public final class CGContext {
         set { internalState.fill = (newValue, Cairo.Pattern(color: newValue)) }
     }
     
+    public func setFillColor(_ color: CGColor) {
+        self.fillColor = color
+    }
+    
+    public func setFillColor(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat = 1.0) {
+        self.fillColor = CGColor(red: red, green: green, blue: blue, alpha: alpha)
+    }
+    
     public var strokeColor: CGColor {
         
         get { return internalState.stroke?.color ?? CGColor.black }
         
         set { internalState.stroke = (newValue, Cairo.Pattern(color: newValue)) }
+    }
+    
+    public func setStrokeColor(_ color: CGColor) {
+        self.strokeColor = color
+    }
+    
+    public func setStrokeColor(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat = 1.0) {
+        self.strokeColor = CGColor(red: red, green: green, blue: blue, alpha: alpha)
     }
     
     @inline(__always)
@@ -274,6 +294,19 @@ public final class CGContext {
     
     // MARK: - Methods
     
+    // MARK: Image
+    
+    public func makeImage() -> CGImage? {
+        surface.flush()
+        do {
+            let pngData = try surface.writePNG()
+            let surfaceImage = try Surface.Image(png: pngData)
+            return CGImage(surface: surfaceImage)
+        } catch {
+            return nil
+        }
+    }
+    
     // MARK: Defining Pages
     
     public func beginPage() {
@@ -299,6 +332,11 @@ public final class CGContext {
     }
     
     public func rotateBy(_ angle: CGFloat) {
+        
+        internalContext.rotate(Double(angle))
+    }
+    
+    public func rotate(by angle: CGFloat) {
         
         internalContext.rotate(Double(angle))
     }
@@ -486,6 +524,12 @@ public final class CGContext {
                                      height: Double(rect.size.height))
     }
     
+    public func addEllipse(in rect: CGRect) {
+        let path = CGMutablePath()
+        path.addEllipse(in: rect)
+        addPath(path)
+    }
+    
     /// Adds a previously created path object to the current path in a graphics context.
     public func addPath(_ path: CGPath) {
         
@@ -558,7 +602,7 @@ public final class CGContext {
         }
     }
     
-    public func clip(evenOdd: Bool = false) {
+    public func clip(evenOdd: Bool) {
         
         if evenOdd {
             
@@ -573,6 +617,23 @@ public final class CGContext {
         }
     }
     
+    public func clip(using rule: CGPathFillRule = .winding) {
+
+        if rule == .evenOdd {
+            
+            internalContext.fillRule = CAIRO_FILL_RULE_EVEN_ODD
+        }
+        
+        internalContext.clip()
+        
+        if rule == .evenOdd {
+            
+            internalContext.fillRule = CAIRO_FILL_RULE_WINDING
+        }
+
+    }
+
+    
     @inline(__always)
     public func clip(to rect: CGRect) {
         
@@ -580,7 +641,7 @@ public final class CGContext {
         addRect(rect)
         clip()
     }
-    
+
     // MARK: - Using Transparency Layers
     
     public func beginTransparencyLayer(in rect: CGRect? = nil, auxiliaryInfo: [String: Any]? = nil) {

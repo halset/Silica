@@ -20,4 +20,13 @@ public final class UIImage {
     public var size: CGSize {
         return CGSize(width: CGFloat(cgImage.width), height: CGFloat(cgImage.height))
     }
+    
+    public func pngData() -> Data? {
+        do {
+            return try cgImage.surface.writePNG()
+        } catch {
+            return nil
+        }
+    }
+    
 }

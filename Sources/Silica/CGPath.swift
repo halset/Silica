@@ -9,7 +9,7 @@
 import Foundation
 
 /// A graphics path is a mathematical description of a series of shapes or lines.
-public struct CGPath {
+public class CGPath {
     
     public typealias Element = PathElement
     
@@ -19,6 +19,10 @@ public struct CGPath {
         
         self.elements = elements
     }
+}
+
+public class CGMutablePath: CGPath {
+    
 }
 
 // MARK: - Supporting Types
@@ -49,7 +53,7 @@ public enum PathElement {
 
 public extension CGPath {
     
-    mutating func addRect(_ rect: CGRect) {
+    func addRect(_ rect: CGRect) {
         
         let newElements: [Element] = [.moveToPoint(CGPoint(x: rect.minX, y: rect.minY)),
                                       .addLineToPoint(CGPoint(x: rect.maxX, y: rect.minY)),
@@ -60,7 +64,7 @@ public extension CGPath {
         elements.append(contentsOf: newElements)
     }
     
-    mutating func addEllipse(in rect: CGRect) {
+    func addEllipse(in rect: CGRect) {
         
         var p = CGPoint()
         var p1 = CGPoint()
@@ -93,27 +97,27 @@ public extension CGPath {
         elements.append(.addCurveToPoint(p1, p2, p))
     }
     
-    mutating func move(to point: CGPoint) {
+    func move(to: CGPoint) {
         
-        elements.append(.moveToPoint(point))
+        elements.append(.moveToPoint(to))
     }
     
-    mutating func addLine(to point: CGPoint) {
+    func addLine(to: CGPoint) {
         
-        elements.append(.addLineToPoint(point))
+        elements.append(.addLineToPoint(to))
     }
     
-    mutating func addCurve(to endPoint: CGPoint, control1: CGPoint, control2: CGPoint) {
+    func addCurve(to endPoint: CGPoint, control1: CGPoint, control2: CGPoint) {
         
         elements.append(.addCurveToPoint(control1, control2, endPoint))
     }
     
-    mutating func addQuadCurve(to endPoint: CGPoint, control: CGPoint) {
+    func addQuadCurve(to endPoint: CGPoint, control: CGPoint) {
         
         elements.append(.addQuadCurveToPoint(control, endPoint))
     }
     
-    mutating func closeSubpath() {
+    func closeSubpath() {
         
         elements.append(.closeSubpath)
     }
