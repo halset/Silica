@@ -769,6 +769,28 @@ public final class CGContext {
         }
     }
     
+    /// Selects a font family/slant/weight for use with the Cairo toy text API.
+    /// Call this before `show(toyText:)` and `toyTextExtents(_:)` to specify the font face.
+    public func selectToyFont(family: String, slant: Cairo.FontSlant = .normal, weight: Cairo.FontWeight = .normal) {
+        internalContext.setFont(face: (family: family, slant: slant, weight: weight))
+    }
+
+    /// Returns the ink bounding box of the given text using the current toy font and `fontSize`.
+    /// The returned `CGSize` contains the pixel width and height of the rendered text.
+    public func toyTextExtents(_ text: String) -> CGSize {
+        // Mirror the font matrix setup used by show(toyText:)
+        var cairoTextMatrix = Matrix.identity
+        cairoTextMatrix.scale(x: Double(fontSize), y: Double(fontSize))
+        cairoTextMatrix.multiply(a: cairoTextMatrix, b: textMatrix.toCairo())
+        internalContext.setFont(matrix: cairoTextMatrix)
+
+        var extents = cairo_text_extents_t()
+        internalContext.withUnsafePointer { ptr in
+            cairo_text_extents(ptr, text, &extents)
+        }
+        return CGSize(width: CGFloat(abs(extents.width)), height: CGFloat(abs(extents.height)))
+    }
+
     public func show(text: String) {
         
         guard let font = internalState.font?.scaledFont,
