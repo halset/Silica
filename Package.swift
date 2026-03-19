@@ -11,12 +11,12 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/PureSwift/Cairo.git",
-            branch: "master"
+            url: "https://github.com/halset/Cairo.git",
+            from: "1.3.2"
         ),
         .package(
             url: "https://github.com/PureSwift/FontConfig.git",
-            branch: "master"
+            from: "2.0.0"
         )
     ],
     targets: [
